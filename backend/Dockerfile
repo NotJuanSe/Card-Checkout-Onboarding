@@ -5,9 +5,9 @@ COPY package*.json ./
 RUN npm ci
 COPY prisma ./prisma
 RUN npx prisma generate
-COPY tsconfig.json nest-cli.json ./
+COPY tsconfig.json tsconfig.build.json nest-cli.json ./
 COPY src ./src
-RUN npm run build
+RUN npm run build && test -f dist/main.js
 
 FROM node:20-alpine AS runtime
 WORKDIR /app
