@@ -1,5 +1,8 @@
 generator client {
   provider = "prisma-client-js"
+  // El contenedor de producción corre sobre Alpine con OpenSSL 3; se declara
+  // explícito para no depender de la autodetección del motor.
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
