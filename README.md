@@ -350,7 +350,6 @@ sandbox, no solo con dobles de prueba:
 .
 ├── backend/          # API Nest.js (hexagonal + ROP + Prisma)
 ├── frontend/         # SPA React + Redux Toolkit
-├── doc/              # enunciado del reto
 ├── docker-compose.yml
 └── README.md
 ```
