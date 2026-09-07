@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { App } from './App';
 import { renderWithStore } from './test/renderWithStore';
 import * as backend from './api/backendClient';
@@ -15,6 +16,29 @@ describe('App', () => {
   it('arranca en la pantalla de producto', () => {
     renderWithStore(<App />);
     expect(screen.getByLabelText('Paso 1 de 4')).toBeInTheDocument();
+  });
+
+  it('sube el scroll al cambiar de paso, para no aterrizar a media página', async () => {
+    mockedBackend.fetchProducts.mockResolvedValue([
+      {
+        id: 'p1',
+        name: 'Audífonos',
+        description: 'desc',
+        priceCents: 100000,
+        imageUrl: 'http://img',
+        stock: 3,
+      },
+    ]);
+    renderWithStore(<App />);
+    (window.scrollTo as jest.Mock).mockClear();
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /Pagar con tarjeta/i }),
+    );
+
+    expect(window.scrollTo).toHaveBeenCalledWith(
+      expect.objectContaining({ top: 0 }),
+    );
   });
 
   it('retoma el paso guardado tras un refresh', () => {
