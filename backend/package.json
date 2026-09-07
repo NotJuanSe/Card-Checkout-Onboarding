@@ -9,7 +9,7 @@
     "start:dev": "nest start --watch",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
-    "prisma:seed": "ts-node prisma/seed.ts",
+    "prisma:seed": "ts-node -r dotenv/config prisma/seed.ts",
     "test": "jest",
     "test:cov": "jest --coverage",
     "lint": "eslint \"src/**/*.ts\""
@@ -41,7 +41,7 @@
     "typescript": "^5.5.0"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node -r dotenv/config prisma/seed.ts"
   },
   "jest": {
     "moduleFileExtensions": [
