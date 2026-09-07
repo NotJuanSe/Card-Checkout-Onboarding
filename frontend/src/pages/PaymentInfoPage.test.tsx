@@ -28,11 +28,12 @@ describe('PaymentInfoPage', () => {
     renderWithStore(<PaymentInfoPage />);
 
     await userEvent.type(screen.getByLabelText('Número de tarjeta'), '4242');
-    expect(screen.getByTestId('card-brand')).toHaveTextContent('VISA');
+    // Aparece dos veces: en el campo y en la vista previa de la tarjeta.
+    expect(screen.getAllByLabelText('Tarjeta VISA')).toHaveLength(2);
 
     await userEvent.clear(screen.getByLabelText('Número de tarjeta'));
     await userEvent.type(screen.getByLabelText('Número de tarjeta'), '5555');
-    expect(screen.getByTestId('card-brand')).toHaveTextContent('Mastercard');
+    expect(screen.getAllByLabelText('Tarjeta Mastercard')).toHaveLength(2);
   });
 
   it('formatea el número en bloques de cuatro', async () => {

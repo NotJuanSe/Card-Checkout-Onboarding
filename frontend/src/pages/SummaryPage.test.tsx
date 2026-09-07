@@ -56,7 +56,8 @@ describe('SummaryPage', () => {
     expect(await screen.findByText('Tarifa base')).toBeInTheDocument();
     expect(screen.getByText('Envío')).toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'Resumen de pago' })).toBeInTheDocument();
-    expect(screen.getByText(/terminada en 4242/)).toBeInTheDocument();
+    expect(screen.getByText(/Terminada en 4242/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Tarjeta VISA')).toBeInTheDocument();
   });
 
   it('dispara el pago con el token guardado', async () => {

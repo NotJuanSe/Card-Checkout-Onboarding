@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { CardBrandLogo } from '../components/CardBrandLogo';
+import { CardPreview } from '../components/CardPreview';
 import { Field } from '../components/Field';
+import { AlertIcon, CreditCardIcon, TruckIcon } from '../components/Icons';
 import {
   detectBrand,
   formatCardNumber,
@@ -87,6 +89,17 @@ export function PaymentInfoPage() {
         Datos de pago y entrega
       </h2>
 
+      <div className="checkout__grid">
+        <aside className="checkout__aside">
+          <CardPreview card={card} />
+        </aside>
+
+        <div className="checkout__fields">
+      <p className="section-title">
+        <CreditCardIcon />
+        Tarjeta
+      </p>
+
       <Field
         id="card-number"
         label="Número de tarjeta"
@@ -163,6 +176,11 @@ export function PaymentInfoPage() {
         </select>
       </div>
 
+      <p className="section-title">
+        <TruckIcon />
+        Contacto y entrega
+      </p>
+
       <Field
         id="full-name"
         label="Nombre completo"
@@ -229,6 +247,7 @@ export function PaymentInfoPage() {
 
       {error && (
         <div className="alert" role="alert">
+          <AlertIcon />
           {error}
         </div>
       )}
@@ -248,6 +267,8 @@ export function PaymentInfoPage() {
       >
         Volver
       </button>
+        </div>
+      </div>
     </section>
   );
 }

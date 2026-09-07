@@ -1,4 +1,10 @@
 import { useEffect } from 'react';
+import {
+  AlertIcon,
+  CheckIcon,
+  ReceiptIcon,
+  SpinnerIcon,
+} from '../components/Icons';
 import { formatCents } from '../domain/money';
 import {
   loadProducts,
@@ -9,6 +15,13 @@ import { clearPersistedState } from '../store/persist';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 
 const POLL_INTERVAL_MS = 3000;
+
+const ICONS = {
+  APPROVED: CheckIcon,
+  DECLINED: AlertIcon,
+  ERROR: AlertIcon,
+  PENDING: SpinnerIcon,
+};
 
 const COPY = {
   APPROVED: {
@@ -53,9 +66,16 @@ export function ResultPage() {
   }
 
   const copy = COPY[status];
+  const StatusIcon = ICONS[status];
 
   return (
     <section className="card status" aria-live="polite">
+      <span
+        className={`status__icon status__icon--${status.toLowerCase()}`}
+        aria-hidden="true"
+      >
+        <StatusIcon />
+      </span>
       <span className={`status__badge status__badge--${status.toLowerCase()}`}>
         {status}
       </span>
@@ -64,8 +84,12 @@ export function ResultPage() {
 
       {transaction && (
         <>
-          <p className="muted">Referencia: {transaction.reference}</p>
-          <strong>{formatCents(transaction.totalAmountCents)}</strong>
+          <strong className="status__amount">
+            {formatCents(transaction.totalAmountCents)}
+          </strong>
+          <p className="status__reference">
+            <ReceiptIcon /> Referencia: {transaction.reference}
+          </p>
         </>
       )}
 
@@ -75,6 +99,7 @@ export function ResultPage() {
 
       {error && (
         <div className="alert" role="alert">
+          <AlertIcon />
           {error}
         </div>
       )}

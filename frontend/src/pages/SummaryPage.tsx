@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { CardBrandLogo } from '../components/CardBrandLogo';
+import { AlertIcon, LockIcon, ReceiptIcon } from '../components/Icons';
 import { quoteTransaction, type AmountBreakdown } from '../api/backendClient';
 import { formatCents } from '../domain/money';
 import {
@@ -44,7 +46,10 @@ export function SummaryPage() {
   return (
     <>
       <section className="card">
-        <h2 className="app__title">Tu pedido</h2>
+        <p className="section-title">
+          <ReceiptIcon />
+          Tu pedido
+        </p>
         <div className="row">
           <span>
             {product.name} × {quantity}
@@ -54,18 +59,23 @@ export function SummaryPage() {
         <p className="muted">
           Entrega en {delivery.address}, {delivery.city}
         </p>
-        <p className="muted">
-          Tarjeta {card.brand} terminada en {card.lastFour} · {card.installments}{' '}
+        <p className="muted card-summary">
+          <span className="card-summary__logo">
+            <CardBrandLogo brand={card.brand} />
+          </span>
+          Terminada en {card.lastFour} · {card.installments}{' '}
           {card.installments === 1 ? 'cuota' : 'cuotas'}
         </p>
       </section>
 
       <dialog className="backdrop" open aria-label="Resumen de pago">
         <div className="backdrop__sheet">
+          <div className="backdrop__handle" />
           <h2 className="app__title">Resumen del pago</h2>
 
           {quoteError && (
             <div className="alert" role="alert">
+              <AlertIcon />
               {quoteError}
             </div>
           )}
@@ -99,7 +109,14 @@ export function SummaryPage() {
             disabled={!quote || paymentStatus === 'paying'}
             onClick={() => void dispatch(payThunk())}
           >
-            {paymentStatus === 'paying' ? 'Procesando pago…' : 'Pagar ahora'}
+            {paymentStatus === 'paying' ? (
+              'Procesando pago…'
+            ) : (
+              <>
+                <LockIcon />
+                Pagar ahora
+              </>
+            )}
           </button>
           <button
             className="button button--ghost"
@@ -108,6 +125,11 @@ export function SummaryPage() {
           >
             Editar datos
           </button>
+
+          <p className="secure-note">
+            <LockIcon />
+            El cobro lo procesa la pasarela; no almacenamos tu tarjeta.
+          </p>
         </div>
       </dialog>
     </>
