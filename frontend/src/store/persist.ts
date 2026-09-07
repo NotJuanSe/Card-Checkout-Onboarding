@@ -24,6 +24,17 @@ export function loadPersistedState(): Partial<CheckoutState> | undefined {
   }
 }
 
+/**
+ * "tokenizing" y "paying" solo existen mientras hay una petición en vuelo: al
+ * recargar, esa petición ya murió y nadie la retoma. Persistirlos dejaba la
+ * pantalla bloqueada en "Procesando pago…" para siempre.
+ */
+function persistableStatus(
+  status: CheckoutState['paymentStatus'],
+): CheckoutState['paymentStatus'] {
+  return status === 'tokenizing' || status === 'paying' ? 'idle' : status;
+}
+
 export function persistState(state: CheckoutState): void {
   try {
     const toPersist: PersistedState = {
@@ -34,7 +45,7 @@ export function persistState(state: CheckoutState): void {
       delivery: state.delivery,
       card: state.card,
       transaction: state.transaction,
-      paymentStatus: state.paymentStatus,
+      paymentStatus: persistableStatus(state.paymentStatus),
     };
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(toPersist));
   } catch {

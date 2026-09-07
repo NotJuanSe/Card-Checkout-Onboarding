@@ -44,6 +44,19 @@ describe('persistencia del checkout', () => {
     expect(loadPersistedState()).not.toHaveProperty('products');
   });
 
+  it.each(['tokenizing', 'paying'] as const)(
+    'no persiste el estado "%s": la petición muere al recargar y dejaría la pantalla bloqueada',
+    (status) => {
+      persistState({ ...baseState(), step: 'SUMMARY', paymentStatus: status });
+      expect(loadPersistedState()).toMatchObject({ paymentStatus: 'idle' });
+    },
+  );
+
+  it('sí conserva el polling, porque ese sí se retoma solo al volver', () => {
+    persistState({ ...baseState(), step: 'RESULT', paymentStatus: 'polling' });
+    expect(loadPersistedState()).toMatchObject({ paymentStatus: 'polling' });
+  });
+
   it('devuelve undefined si no hay nada guardado o el JSON está corrupto', () => {
     expect(loadPersistedState()).toBeUndefined();
     window.localStorage.setItem('checkout-state-v1', '{no-json');
