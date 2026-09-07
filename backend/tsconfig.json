@@ -17,11 +17,11 @@
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "rootDir": "./src"
+    "esModuleInterop": true
   },
   "include": [
-    "src"
+    "src",
+    "prisma"
   ],
   "exclude": [
     "node_modules",

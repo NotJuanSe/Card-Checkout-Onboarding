@@ -6,5 +6,11 @@
     "prisma",
     "test",
     "**/*.spec.ts"
+  ],
+  "compilerOptions": {
+    "rootDir": "./src"
+  },
+  "include": [
+    "src"
   ]
 }
