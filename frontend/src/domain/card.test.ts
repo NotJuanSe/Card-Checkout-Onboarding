@@ -38,6 +38,10 @@ describe('formatCardNumber', () => {
   it('ignora caracteres no numéricos', () => {
     expect(formatCardNumber('4242-4242 abc')).toBe('4242 4242');
   });
+
+  it('corta en 16 dígitos: no existen VISA ni Mastercard más largas de uso común', () => {
+    expect(formatCardNumber('4242424242424242999')).toBe('4242 4242 4242 4242');
+  });
 });
 
 describe('isValidLuhn', () => {

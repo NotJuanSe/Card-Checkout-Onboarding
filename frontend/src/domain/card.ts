@@ -8,6 +8,9 @@ export interface CardInput {
   cvc: string;
 }
 
+/** VISA y Mastercard de consumo son de 16 dígitos; no aceptamos otras franquicias. */
+export const MAX_CARD_DIGITS = 16;
+
 export function onlyDigits(value: string): string {
   return (value ?? '').replace(/\D/g, '');
 }
@@ -28,7 +31,8 @@ export function detectBrand(cardNumber: string): CardBrand {
 
 /** Agrupa en bloques de 4 para que el número sea legible al escribirlo. */
 export function formatCardNumber(cardNumber: string): string {
-  return (onlyDigits(cardNumber).match(/.{1,4}/g) ?? []).join(' ').slice(0, 23);
+  const digits = onlyDigits(cardNumber).slice(0, MAX_CARD_DIGITS);
+  return (digits.match(/.{1,4}/g) ?? []).join(' ');
 }
 
 /** Algoritmo de Luhn: descarta números con dígitos tecleados al azar. */

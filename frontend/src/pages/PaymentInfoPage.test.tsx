@@ -42,6 +42,19 @@ describe('PaymentInfoPage', () => {
     expect(screen.getByLabelText('Número de tarjeta')).toHaveValue('4242 4242 4242 4242');
   });
 
+  it('no deja escribir más de 16 dígitos en el número', async () => {
+    renderWithStore(<PaymentInfoPage />);
+
+    await userEvent.type(
+      screen.getByLabelText('Número de tarjeta'),
+      '4242424242424242999',
+    );
+
+    expect(screen.getByLabelText('Número de tarjeta')).toHaveValue(
+      '4242 4242 4242 4242',
+    );
+  });
+
   it('bloquea el envío y muestra errores con datos inválidos', async () => {
     renderWithStore(<PaymentInfoPage />);
 

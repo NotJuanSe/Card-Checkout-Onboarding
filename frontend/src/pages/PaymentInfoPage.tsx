@@ -6,6 +6,7 @@ import { AlertIcon, CreditCardIcon, TruckIcon } from '../components/Icons';
 import {
   detectBrand,
   formatCardNumber,
+  MAX_CARD_DIGITS,
   onlyDigits,
   validateCard,
   type CardInput,
@@ -106,10 +107,12 @@ export function PaymentInfoPage() {
         value={formatCardNumber(card.number)}
         placeholder="4242 4242 4242 4242"
         inputMode="numeric"
-        maxLength={23}
+        maxLength={MAX_CARD_DIGITS + 3}
         autoComplete="cc-number"
         error={errors.number}
-        onChange={(value) => setCard({ ...card, number: onlyDigits(value) })}
+        onChange={(value) =>
+          setCard({ ...card, number: onlyDigits(value).slice(0, MAX_CARD_DIGITS) })
+        }
       >
         <CardBrandLogo brand={brand} />
       </Field>
