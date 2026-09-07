@@ -6,8 +6,10 @@ import { formatCents } from '../domain/money';
 import {
   goToStep,
   payThunk,
+  resetCheckout,
   selectSelectedProduct,
 } from '../store/checkoutSlice';
+import { clearPersistedState } from '../store/persist';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 
 /**
@@ -37,9 +39,22 @@ export function SummaryPage() {
 
   if (!product || !card || !delivery) {
     return (
-      <div className="alert" role="alert">
-        Falta información de la compra. Vuelve al producto para empezar de nuevo.
-      </div>
+      <section className="card">
+        <div className="alert" role="alert">
+          <AlertIcon />
+          No pudimos recuperar los datos de esta compra.
+        </div>
+        <button
+          className="button"
+          type="button"
+          onClick={() => {
+            clearPersistedState();
+            dispatch(resetCheckout());
+          }}
+        >
+          Volver a la tienda
+        </button>
+      </section>
     );
   }
 

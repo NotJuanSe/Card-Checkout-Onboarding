@@ -99,9 +99,15 @@ describe('SummaryPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('pide reiniciar si falta información de la compra', () => {
-    renderWithStore(<SummaryPage />, { step: 'SUMMARY' });
-    expect(screen.getByRole('alert')).toHaveTextContent('Falta información');
+  it('ofrece volver a la tienda si no se pudieron recuperar los datos', async () => {
+    mockedBackend.fetchProducts.mockResolvedValue([]);
+    const { store } = renderWithStore(<SummaryPage />, { step: 'SUMMARY' });
+
+    expect(screen.getByRole('alert')).toHaveTextContent('No pudimos recuperar');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Volver a la tienda' }));
+
+    expect(store.getState().checkout.step).toBe('PRODUCT');
   });
 
   it('permite editar los datos de pago', async () => {

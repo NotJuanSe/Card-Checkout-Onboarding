@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
 import { renderWithStore } from './test/renderWithStore';
@@ -38,6 +38,49 @@ describe('App', () => {
 
     expect(window.scrollTo).toHaveBeenCalledWith(
       expect.objectContaining({ top: 0 }),
+    );
+  });
+
+  it('recarga el catálogo al retomar un paso avanzado, para no quedar sin datos del producto', async () => {
+    const product = {
+      id: 'p1',
+      name: 'Audífonos',
+      description: 'desc',
+      priceCents: 100000,
+      imageUrl: 'http://img',
+      stock: 3,
+    };
+    mockedBackend.fetchProducts.mockResolvedValue([product]);
+    mockedBackend.quoteTransaction.mockResolvedValue({
+      productAmountCents: 100000,
+      baseFeeCents: 500000,
+      deliveryFeeCents: 1000000,
+      totalAmountCents: 1600000,
+    });
+
+    const { store } = renderWithStore(<App />, {
+      step: 'SUMMARY',
+      selectedProductId: 'p1',
+      quantity: 1,
+      customer: {
+        fullName: 'Ana Gómez',
+        email: 'ana@example.com',
+        phone: '3001234567',
+        legalId: '1020304050',
+      },
+      delivery: { address: 'Calle 1', city: 'Bogotá', region: 'Cundinamarca' },
+      card: {
+        brand: 'VISA',
+        lastFour: '4242',
+        holder: 'ANA GOMEZ',
+        token: 'tok_1',
+        installments: 1,
+      },
+    });
+
+    expect(await screen.findByText('Resumen del pago')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(store.getState().checkout.products).toHaveLength(1),
     );
   });
 

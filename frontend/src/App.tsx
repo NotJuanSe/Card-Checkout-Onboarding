@@ -1,14 +1,26 @@
 import { useEffect } from 'react';
 import { BagIcon, LockIcon } from './components/Icons';
+import { loadProducts } from './store/checkoutSlice';
 import { StepIndicator } from './components/StepIndicator';
 import { PaymentInfoPage } from './pages/PaymentInfoPage';
 import { ProductPage } from './pages/ProductPage';
 import { ResultPage } from './pages/ResultPage';
 import { SummaryPage } from './pages/SummaryPage';
-import { useAppSelector } from './store/hooks';
+import { useAppDispatch, useAppSelector } from './store/hooks';
 
 export function App() {
+  const dispatch = useAppDispatch();
   const step = useAppSelector((state) => state.checkout.step);
+  const productsStatus = useAppSelector((state) => state.checkout.productsStatus);
+
+  // El catálogo no se persiste, para que el stock llegue siempre fresco. Se pide
+  // aquí y no solo en la pantalla de productos porque, tras recargar, se puede
+  // aterrizar directo en el resumen, que también necesita los datos del producto.
+  useEffect(() => {
+    if (productsStatus === 'idle') {
+      void dispatch(loadProducts());
+    }
+  }, [dispatch, productsStatus]);
 
   // Cada paso es una pantalla distinta: si el scroll se queda donde estaba, la
   // persona aterriza a media página y parece que la app se rompió.
