@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: checkout-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /products
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: PAYMENT_GATEWAY_BASE_URL
+        sync: false
+      - key: PAYMENT_GATEWAY_PUBLIC_KEY
+        sync: false
+      - key: PAYMENT_GATEWAY_PRIVATE_KEY
+        sync: false
+      - key: PAYMENT_GATEWAY_INTEGRITY_SECRET
+        sync: false
+      - key: BASE_FEE_CENTS
+        value: 500000
