@@ -29,7 +29,7 @@ export function App() {
           <span className="brand__mark">
             <BagIcon />
           </span>
-          Tienda
+          <span>Tienda</span>
         </h1>
         <StepIndicator step={step} />
       </header>

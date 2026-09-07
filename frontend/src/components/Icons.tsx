@@ -12,7 +12,7 @@ function Svg({ children }: Readonly<{ children: React.ReactNode }>) {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      role="presentation"
+      aria-hidden="true"
       focusable="false"
     >
       {children}
