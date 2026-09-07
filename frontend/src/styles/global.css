@@ -741,8 +741,9 @@ h3 {
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  background: rgba(248, 113, 113, 0.12);
-  border: 1px solid rgba(248, 113, 113, 0.28);
+  /* Fondo opaco: el contraste no depende de la superficie que quede detrás. */
+  background: #2b1a1d;
+  border: 1px solid #5c2b31;
   color: #fecaca;
   border-radius: 13px;
   padding: 12px 14px;

@@ -25,8 +25,6 @@
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "prisma",
-    "**/*.spec.ts"
+    "dist"
   ]
 }
