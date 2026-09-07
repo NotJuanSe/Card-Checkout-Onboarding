@@ -1,5 +1,27 @@
 # Card Checkout Onboarding
 
+## Aplicación desplegada
+
+| | |
+|---|---|
+| **Tienda (SPA)** | https://card-checkout-onboarding.vercel.app |
+| **API** | https://checkout-api-9yuu.onrender.com |
+| **Documentación de la API (Swagger)** | https://checkout-api-9yuu.onrender.com/api/docs |
+
+**Tarjetas de prueba** (entorno sandbox, no mueven dinero real):
+
+| Número | Resultado | Datos restantes |
+|---|---|---|
+| `4242 4242 4242 4242` | Pago aprobado | Vence `12/30`, CVC `123`, cualquier titular |
+| `4111 1111 1111 1111` | Pago rechazado | Vence `12/30`, CVC `123`, cualquier titular |
+
+> La API vive en el plan gratuito de Render, que suspende el servicio tras 15 minutos
+> sin tráfico. Si es la primera visita en un rato, la pantalla de productos puede
+> tardar hasta un minuto en cargar mientras el contenedor despierta; a partir de ahí
+> responde en menos de un segundo.
+
+---
+
 Aplicación full-stack de checkout: el cliente ve un producto con su stock, paga con
 tarjeta de crédito a través de una pasarela en modo **sandbox**, y al confirmarse el
 pago se actualizan la transacción, la entrega asignada y el stock.
@@ -136,8 +158,8 @@ Todos los montos se guardan en **centavos (enteros)** para evitar errores de red
 
 ## API
 
-Documentación interactiva (Swagger) al levantar el backend:
-**`http://localhost:3000/api/docs`** (en el despliegue: `https://<tu-dominio-api>/api/docs`).
+Documentación interactiva (Swagger):
+**https://checkout-api-9yuu.onrender.com/api/docs** — en local, `http://localhost:3000/api/docs`.
 
 | Método | Ruta                     | Descripción |
 |--------|--------------------------|-------------|
@@ -251,14 +273,14 @@ Resultados (`jest --coverage`, umbral configurado en 80% y falla el build si baj
 | Functions | **100%** |
 | Lines | **99.72%** |
 
-### Frontend — 15 suites, 71 tests
+### Frontend — 16 suites, 77 tests
 
 | Métrica | Cobertura |
 |---------|-----------|
-| Statements | **99.37%** |
-| Branches | **93.60%** |
-| Functions | **98.83%** |
-| Lines | **99.33%** |
+| Statements | **99.18%** |
+| Branches | **93.91%** |
+| Functions | **99.00%** |
+| Lines | **99.13%** |
 
 Qué se prueba: reglas de dominio (Luhn, franquicias, vigencia, tarifas, cálculo de
 montos), casos de uso completos con puertos mockeados (incluyendo pago aprobado sin
@@ -268,47 +290,59 @@ refresh y las 4 pantallas con React Testing Library.
 
 ---
 
-## Despliegue en AWS
+## Infraestructura y despliegue
 
-Arquitectura sugerida (elegible dentro de la capa gratuita):
+La aplicación está desplegada en tres servicios, uno por cada pieza:
 
 ```
-CloudFront ──> S3 (SPA estática)
-                   │
-                   └── HTTPS ──> ALB ──> ECS Fargate (API Nest.js) ──> RDS PostgreSQL
+Vercel (SPA estática)  ──HTTPS──>  Render (API en contenedor)  ──>  Supabase (PostgreSQL)
+                             │
+                             └──HTTPS──>  Pasarela de pagos (sandbox)
 ```
 
-**Frontend (S3 + CloudFront)**
+| Pieza | Proveedor | Detalle |
+|---|---|---|
+| SPA | Vercel | Build de Vite, reescrituras hacia `index.html` y cabeceras de seguridad (`frontend/vercel.json`). |
+| API | Render | Contenedor construido desde `backend/Dockerfile`, definido como blueprint en `render.yaml`. |
+| Base de datos | Supabase | PostgreSQL gestionado. El runtime usa el pooler en modo transacción y las migraciones la conexión de sesión. |
 
-```bash
-cd frontend
-VITE_API_URL=https://<tu-dominio-api> \
-VITE_PAYMENT_GATEWAY_URL=<url-sandbox> \
-VITE_PAYMENT_GATEWAY_PUBLIC_KEY=<llave-publica> \
-npm run build
-aws s3 sync dist/ s3://<tu-bucket> --delete
-aws cloudfront create-invalidation --distribution-id <id> --paths "/*"
-```
+### Cómo reproducir el despliegue
 
-Configurar el bucket como origen de CloudFront con *Origin Access Control*, redirigir
-403/404 a `/index.html` (SPA) y forzar HTTPS.
+**API en Render**
 
-**Backend (ECR + ECS Fargate + RDS)**
+1. Blueprints → New Blueprint Instance → seleccionar este repositorio.
+2. Render lee `render.yaml` y crea el servicio en plan gratuito.
+3. Cargar las variables marcadas como secretas (ver la tabla de variables de entorno).
+4. Aplicar las migraciones y el seed una vez: `npx prisma migrate deploy` y `npm run prisma:seed`.
 
-```bash
-cd backend
-docker build -t checkout-api .
-aws ecr get-login-password | docker login --username AWS --password-stdin <cuenta>.dkr.ecr.<region>.amazonaws.com
-docker tag checkout-api <cuenta>.dkr.ecr.<region>.amazonaws.com/checkout-api:latest
-docker push <cuenta>.dkr.ecr.<region>.amazonaws.com/checkout-api:latest
-```
+**SPA en Vercel**
 
-Luego: crear la instancia RDS PostgreSQL, guardar las llaves de la pasarela en AWS
-Secrets Manager, inyectarlas como variables de entorno de la task definition, ejecutar
-`npx prisma migrate deploy` y `npm run prisma:seed` una vez, y exponer el servicio tras
-un ALB con certificado ACM (HTTPS). `CORS_ORIGIN` debe apuntar al dominio de CloudFront.
+1. Add New → Project → importar el repositorio.
+2. **Root Directory: `frontend`**.
+3. Definir `VITE_API_URL` con la URL de la API, más la URL y la llave **pública** de la pasarela.
+4. Deploy.
 
----
+**Enlazar ambos**: en Render, `CORS_ORIGIN` debe contener el dominio de Vercel. Acepta
+varios orígenes separados por coma, por ejemplo
+`https://tu-app.vercel.app,http://localhost:5173`.
+
+### Nota sobre la elección de proveedor
+
+El enunciado sugiere AWS pero admite cualquier proveedor cloud. Esta combinación cubre
+las mismas tres piezas que tendría en AWS (S3 y CloudFront para la SPA, ECS para la API,
+RDS para la base) sin la configuración de red y roles que exige esa plataforma, y sin
+riesgo de cobros por recursos olvidados encendidos.
+
+## Verificación end-to-end
+
+El flujo se probó completo contra la aplicación desplegada y la pasarela real en modo
+sandbox, no solo con dobles de prueba:
+
+- Pago aprobado: transacción creada en `PENDING`, confirmada como `APPROVED` contra la
+  pasarela, stock descontado y entrega en estado `ASSIGNED`.
+- Pago rechazado: transacción en `DECLINED`, entrega cancelada y **stock intacto**.
+- CORS: la API responde a peticiones del dominio de Vercel y las rechaza desde cualquier otro.
+- Bundle del navegador auditado: no contiene la llave privada ni la de integridad.
 
 ## Estructura del repositorio
 
