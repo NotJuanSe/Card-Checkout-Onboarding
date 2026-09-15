@@ -40,9 +40,10 @@ const readyState: Partial<CheckoutState> = {
 
 const quote = {
   productAmountCents: 200000,
+  vatCents: 38000,
   baseFeeCents: 500000,
   deliveryFeeCents: 1000000,
-  totalAmountCents: 1700000,
+  totalAmountCents: 1738000,
 };
 
 describe('SummaryPage', () => {
@@ -54,6 +55,7 @@ describe('SummaryPage', () => {
     renderWithStore(<SummaryPage />, readyState);
 
     expect(await screen.findByText('Tarifa base')).toBeInTheDocument();
+    expect(screen.getByText('IVA (19%)')).toBeInTheDocument();
     expect(screen.getByText('Envío')).toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'Resumen de pago' })).toBeInTheDocument();
     expect(screen.getByText(/Terminada en 4242/)).toBeInTheDocument();
@@ -68,9 +70,10 @@ describe('SummaryPage', () => {
       productId: 'p1',
       quantity: 2,
       productAmountCents: 200000,
+      vatCents: 38000,
       baseFeeCents: 500000,
       deliveryFeeCents: 1000000,
-      totalAmountCents: 1700000,
+      totalAmountCents: 1738000,
       currency: 'COP',
       status: 'PENDING',
       failureReason: null,

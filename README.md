@@ -39,7 +39,7 @@ pago se actualizan la transacción, la entrega asignada y el stock.
 1. **Producto** — catálogo con descripción, precio y unidades disponibles.
 2. **Tarjeta + entrega** — formulario con validación de tarjeta (Luhn, vigencia, CVC)
    y detección de franquicia VISA/Mastercard, más los datos de envío.
-3. **Resumen** — *backdrop* con el desglose: producto, tarifa base y envío.
+3. **Resumen** — *backdrop* con el desglose: producto, IVA, tarifa base y envío.
 4. **Estado final** — resultado del pago (aprobado / rechazado), con reconsulta
    automática mientras la transacción siga pendiente.
 5. **Producto** — regreso al catálogo con el stock ya actualizado.
@@ -142,6 +142,7 @@ erDiagram
         uuid   customerId FK
         uuid   deliveryId FK "único"
         int    productAmountCents
+        int    vatCents
         int    baseFeeCents
         int    deliveryFeeCents
         int    totalAmountCents
@@ -154,6 +155,11 @@ erDiagram
 
 Todos los montos se guardan en **centavos (enteros)** para evitar errores de redondeo.
 
+El **IVA** grava el precio del producto, no las tarifas, y se redondea a centavos
+enteros para que el desglose sume exactamente el total cobrado. La tasa se lee de
+`VAT_RATE` y el cálculo vive en el dominio (`calculateAmounts`), de modo que la
+cotización previa y el cobro real usan siempre la misma fuente.
+
 ---
 
 ## API
@@ -165,7 +171,7 @@ Documentación interactiva (Swagger):
 |--------|--------------------------|-------------|
 | GET    | `/products`              | Catálogo con stock disponible. |
 | GET    | `/products/:id`          | Detalle de un producto. |
-| POST   | `/transactions/quote`    | Desglose (producto + tarifa base + envío) antes de pagar. |
+| POST   | `/transactions/quote`    | Desglose (producto + IVA + tarifa base + envío) antes de pagar. |
 | POST   | `/transactions`          | Crea la transacción en `PENDING` y la cobra contra la pasarela. |
 | GET    | `/transactions/:id`      | Estado actual; si sigue pendiente reconsulta la pasarela, descuenta stock y asigna la entrega al aprobarse. |
 | GET    | `/customers/:id`         | Datos del cliente de la compra. |
@@ -241,6 +247,7 @@ npm run dev
 | `PAYMENT_GATEWAY_PRIVATE_KEY` | Llave privada (crear/consultar transacciones). |
 | `PAYMENT_GATEWAY_INTEGRITY_SECRET` | Secreto para firmar la integridad del monto. |
 | `BASE_FEE_CENTS` | Tarifa base fija por compra, en centavos. |
+| `VAT_RATE` | IVA en decimal (`0.19` = 19%). Si falta o es inválido, se usa 0.19. |
 
 **frontend/.env**
 

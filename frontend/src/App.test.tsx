@@ -53,6 +53,7 @@ describe('App', () => {
     mockedBackend.fetchProducts.mockResolvedValue([product]);
     mockedBackend.quoteTransaction.mockResolvedValue({
       productAmountCents: 100000,
+      vatCents: 19000,
       baseFeeCents: 500000,
       deliveryFeeCents: 1000000,
       totalAmountCents: 1600000,
@@ -93,6 +94,7 @@ describe('App', () => {
         productId: 'p1',
         quantity: 1,
         productAmountCents: 100000,
+        vatCents: 19000,
         baseFeeCents: 500000,
         deliveryFeeCents: 1000000,
         totalAmountCents: 1600000,
