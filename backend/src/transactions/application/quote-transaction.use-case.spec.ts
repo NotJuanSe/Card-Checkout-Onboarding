@@ -37,9 +37,10 @@ describe('QuoteTransactionUseCase', () => {
 
     expect(result.unwrap()).toEqual({
       productAmountCents: 200000,
+      vatCents: 38000,
       baseFeeCents: 500000,
       deliveryFeeCents: 1000000,
-      totalAmountCents: 1700000,
+      totalAmountCents: 1738000,
     });
   });
 

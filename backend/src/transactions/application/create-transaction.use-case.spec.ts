@@ -66,7 +66,7 @@ describe('CreateTransactionUseCase', () => {
         id: 't1',
         reference: 'ORD-1-AAA',
         currency: 'COP',
-        totalAmountCents: 211000,
+        totalAmountCents: 1738000,
         status: 'PENDING',
       } as never),
       findById: jest.fn(),
@@ -106,9 +106,10 @@ describe('CreateTransactionUseCase', () => {
         customerId: 'c1',
         deliveryId: 'd1',
         productAmountCents: 200000,
+        vatCents: 38000,
         baseFeeCents: 500000,
         deliveryFeeCents: 1000000,
-        totalAmountCents: 1700000,
+        totalAmountCents: 1738000,
       }),
     );
     expect(gateway.charge).toHaveBeenCalledWith(

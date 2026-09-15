@@ -10,6 +10,7 @@ import { DomainError } from '../../shared/core/domain-error';
 import { Result } from '../../shared/core/result';
 import { AmountBreakdown, calculateAmounts } from '../domain/transaction.entity';
 import { QuoteDto } from './dto/quote.dto';
+import { vatRateFrom } from './vat-rate';
 
 export const DEFAULT_BASE_FEE_CENTS = 500000;
 
@@ -46,6 +47,7 @@ export class QuoteTransactionUseCase {
         input.quantity,
         this.baseFeeCents(),
         deliveryFeeCents(input.city),
+        vatRateFrom(this.config),
       ),
     );
   }

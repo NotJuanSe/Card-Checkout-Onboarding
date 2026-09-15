@@ -35,6 +35,7 @@ import {
   Transaction,
 } from '../domain/transaction.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { vatRateFrom } from './vat-rate';
 
 const DEFAULT_BASE_FEE_CENTS = 500000;
 const CURRENCY = 'COP';
@@ -83,6 +84,7 @@ export class CreateTransactionUseCase {
       input.quantity,
       this.baseFeeCents(),
       feeCents,
+      vatRateFrom(this.config),
     );
 
     const customer = await this.customers.findOrCreateByEmail(input.customer);

@@ -9,6 +9,7 @@ export interface CreateTransactionData {
   customerId: string;
   deliveryId: string;
   productAmountCents: number;
+  vatCents: number;
   baseFeeCents: number;
   deliveryFeeCents: number;
   totalAmountCents: number;

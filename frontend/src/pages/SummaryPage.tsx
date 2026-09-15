@@ -102,6 +102,10 @@ export function SummaryPage() {
                 <span>{formatCents(quote.productAmountCents)}</span>
               </div>
               <div className="row">
+                <span>IVA (19%)</span>
+                <span>{formatCents(quote.vatCents)}</span>
+              </div>
+              <div className="row">
                 <span>Tarifa base</span>
                 <span>{formatCents(quote.baseFeeCents)}</span>
               </div>

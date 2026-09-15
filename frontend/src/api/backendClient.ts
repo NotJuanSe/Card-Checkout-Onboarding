@@ -35,6 +35,7 @@ export async function createTransaction(
 
 export interface AmountBreakdown {
   productAmountCents: number;
+  vatCents: number;
   baseFeeCents: number;
   deliveryFeeCents: number;
   totalAmountCents: number;

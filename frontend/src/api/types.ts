@@ -15,6 +15,7 @@ export interface Transaction {
   productId: string;
   quantity: number;
   productAmountCents: number;
+  vatCents: number;
   baseFeeCents: number;
   deliveryFeeCents: number;
   totalAmountCents: number;

@@ -14,6 +14,7 @@ export interface Transaction {
   customerId: string;
   deliveryId: string;
   productAmountCents: number;
+  vatCents: number;
   baseFeeCents: number;
   deliveryFeeCents: number;
   totalAmountCents: number;
@@ -25,23 +26,34 @@ export interface Transaction {
 
 export interface AmountBreakdown {
   productAmountCents: number;
+  vatCents: number;
   baseFeeCents: number;
   deliveryFeeCents: number;
   totalAmountCents: number;
 }
+
+/** IVA general en Colombia. */
+export const DEFAULT_VAT_RATE = 0.19;
 
 export function calculateAmounts(
   unitPriceCents: number,
   quantity: number,
   baseFeeCents: number,
   deliveryFeeCents: number,
+  vatRate: number = DEFAULT_VAT_RATE,
 ): AmountBreakdown {
   const productAmountCents = unitPriceCents * quantity;
+  // El IVA grava el precio base del producto. Se redondea a centavos enteros
+  // para que la suma del desglose cuadre exactamente con el total cobrado.
+  const vatCents = Math.round(productAmountCents * vatRate);
+
   return {
     productAmountCents,
+    vatCents,
     baseFeeCents,
     deliveryFeeCents,
-    totalAmountCents: productAmountCents + baseFeeCents + deliveryFeeCents,
+    totalAmountCents:
+      productAmountCents + vatCents + baseFeeCents + deliveryFeeCents,
   };
 }
 
